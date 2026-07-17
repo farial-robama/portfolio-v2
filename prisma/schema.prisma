@@ -1,0 +1,230 @@
+// ============================================================
+//  Portfolio CMS — Prisma schema
+//  Postgres. Run: npx prisma migrate dev --name init
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* ---------------- Auth ---------------- */
+
+enum Role {
+  OWNER
+  EDITOR
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(OWNER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/* ---------------- FE-01 Hero (singleton) ---------------- */
+
+model Hero {
+  id          String   @id @default(cuid())
+  headline    String
+  subheadline String
+  ctaLabel    String
+  ctaHref     String
+  videoUrl    String?
+  posterUrl   String?
+  updatedAt   DateTime @updatedAt
+}
+
+/* ---------------- FE-02 Services ---------------- */
+
+model Service {
+  id           String   @id @default(cuid())
+  icon         String
+  title        String
+  blurb        String
+  categorySlug String?
+  sort         Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/* ---------------- MOD-01 Projects ---------------- */
+
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Project {
+  id        String          @id @default(cuid())
+  slug      String          @unique
+  title     String
+  category  String?
+  year      Int?
+  bodyJson  Json
+  status    ProjectStatus   @default(DRAFT)
+  publishAt DateTime?
+  sort      Int             @default(0)
+
+  tools     ProjectTool[]
+  metrics   ProjectMetric[]
+  media     ProjectMedia[]
+
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime?
+
+  @@index([status, sort])
+  @@index([category])
+}
+
+model ProjectMetric {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  label     String
+  value     String
+  unit      String?
+  sort      Int     @default(0)
+}
+
+model Tool {
+  id       String        @id @default(cuid())
+  name     String        @unique
+  projects ProjectTool[]
+}
+
+model ProjectTool {
+  projectId String
+  toolId    String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tool      Tool    @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, toolId])
+}
+
+/* ---------------- MOD-02 Media ---------------- */
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model Media {
+  id           String    @id @default(cuid())
+  provider     String
+  key          String
+  url          String
+  type         MediaType
+  width        Int?
+  height       Int?
+  variantsJson Json?
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
+
+  projectLinks ProjectMedia[]
+}
+
+model ProjectMedia {
+  projectId String
+  mediaId   String
+  role      String  @default("gallery")
+  sort      Int     @default(0)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  media   Media   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, mediaId])
+}
+
+/* ---------------- MOD-03 Skills ---------------- */
+
+model SkillCategory {
+  id     String  @id @default(cuid())
+  name   String
+  sort   Int     @default(0)
+  skills Skill[]
+}
+
+model Skill {
+  id          String        @id @default(cuid())
+  categoryId  String
+  category    SkillCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name        String
+  proficiency Int
+  icon        String?
+  descriptor  String?
+  sort        Int           @default(0)
+
+  @@index([categoryId, sort])
+}
+
+/* ---------------- MOD-04 Experience ---------------- */
+
+model Experience {
+  id          String            @id @default(cuid())
+  company     String
+  role        String
+  location    String?
+  logoMediaId String?
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean           @default(false)
+  sort        Int               @default(0)
+  points      ExperiencePoint[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+
+  @@index([startDate])
+}
+
+model ExperiencePoint {
+  id           String     @id @default(cuid())
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  text         String
+  sort         Int        @default(0)
+}
+
+/* ---------------- MOD-05 Leads ---------------- */
+
+enum LeadStatus {
+  UNREAD
+  READ
+  STARRED
+  ARCHIVED
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  status    LeadStatus @default(UNREAD)
+  source    String?
+  createdAt DateTime   @default(now())
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+/* ---------------- MOD-06 SEO ---------------- */
+
+model SeoMeta {
+  id          String   @id @default(cuid())
+  path        String   @unique
+  title       String?
+  description String?
+  ogImageUrl  String?
+  canonical   String?
+  updatedAt   DateTime @updatedAt
+}

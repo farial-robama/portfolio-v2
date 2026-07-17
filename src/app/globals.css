@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-cream text-ink font-sans antialiased;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-medium transition-all;
+  }
+  .btn-solid {
+    @apply bg-ink text-cream hover:opacity-90;
+  }
+  .btn-outline {
+    @apply border border-ink text-ink hover:bg-ink hover:text-cream;
+  }
+  .btn-cv {
+    @apply border border-rule text-ink hover:border-teal hover:text-teal;
+  }
+  .chip {
+    @apply rounded-full bg-cream-2 px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide text-ink-soft;
+  }
+}

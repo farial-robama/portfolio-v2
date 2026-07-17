@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "tag": "Government · Public Sector",
+    "title": "Fire Service System",
+    "description": "A records and operations system built for fire service reporting and coordination.",
+    "stack": ["PHP", "Laravel", "MySQL", "Bootstrap"]
+  },
+  {
+    "id": "2",
+    "tag": "Education · Library",
+    "title": "PMB Library Management",
+    "description": "Optimized database and data modelling for the Alliance Française library system.",
+    "stack": ["PHP", "MySQL", "HTML/CSS"]
+  },
+  {
+    "id": "3",
+    "tag": "Personal Brand",
+    "title": "Personal Portfolio",
+    "description": "An earlier iteration of this very site — WordPress-powered and PHP-driven.",
+    "stack": ["PHP", "WordPress", "JavaScript"]
+  },
+  {
+    "id": "4",
+    "tag": "E-commerce",
+    "title": "Secure Payment Storefront",
+    "description": "An e-commerce build with a full Stripe checkout integration.",
+    "stack": ["React", "Node.js", "Stripe API"]
+  }
+]
